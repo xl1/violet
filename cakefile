@@ -1,0 +1,12 @@
+{ spawn, exec } = require 'child_process'
+which = require('which').sync
+
+launch = (command, options, callback) ->
+  st = spawn(which(command), options, customFds:[0..2])
+  st.on 'exit', (stat) -> stat or callback?()
+
+task 'build', ->
+  launch 'coffee', ['-cj', 'script/code.js',
+    'script/core.coffee', 'script/keyhandler.coffee', 'script/code.coffee']
+  launch 'coffee', ['-cj', 'script/main.js',
+    'script/main.coffee']
